@@ -6,7 +6,7 @@ Created on Oct 27, 2010
 from numpy import *
 import matplotlib
 import matplotlib.pyplot as plt
-from Ch02 import kNN
+from K_Nearest_neighbors import kNN
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
