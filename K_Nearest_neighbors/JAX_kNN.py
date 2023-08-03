@@ -9,7 +9,7 @@ Input:      inX: vector to compare to existing dataset (1xN)
 
 Output:     the most popular class label
 
-@author: pbharrin
+@author: pbharri
 '''
 import jax
 import jax.numpy as jnp
