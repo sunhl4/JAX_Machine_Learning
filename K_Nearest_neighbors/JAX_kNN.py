@@ -54,7 +54,7 @@ def File2Matrix(filename):
         line = line.strip()
         ListFromLine = line.split('\t')
         ReturnData[index,:] = ListFromLine[0:3]
-#        ClassLabelVector.append(int(ListFromLine[-1]))
+#       ClassLabelVector.append(int(ListFromLine[-1]))
         ClassLabelVector.append(ListFromLine[-1])
 
         index +=1
@@ -108,25 +108,41 @@ def ClassifyPerson():
     ClassifierResult = Classfy0((InArray - MinValue)/LargestDistance, NormalizationData, DatingLabels, 3)
     print ("You will probably like this person: %s " % LabelList[ClassifierResult -1])
 
-def img2vector(filename):
-    returnVect = np.zeros((1, 1024))
-    fr = open(filename)
-    for i in range(32):
-        lineStr = fr.readline()
-        for j in range(32):
-            returnVect[0, 32*i+j] = int(lineStr[j])
-    return returnVect
 
 def Img2Vector(filename):
-    ReturnVector = jnp.zeros(1,1024)
+    ReturnVector = onp.zeros((1,1024))
     fr = open(filename)
+    LineStrings = fr.readlines()
     for i in range(32):
-        LineString = fr.readlines()
+        LineString = LineStrings[i]
         for j in range(32):
-            ReturnVector[0,32*1+j] = int(LineString[j])
+           ReturnVector[0, 32*i+j] = (LineString[j])
     return ReturnVector
 
-
+def HandWritingClassTest():
+    HandWritingLabels = []
+    TrainingFileList = listdir('digits/trainingDigits')
+    NumberTrainSet = len(TrainingFileList)
+    TrainingDataSet = onp.zeros((NumberTrainSet,1024))
+    for i in range(NumberTrainSet):
+        FileNameString = TrainingFileList[i]
+        FileString = FileNameString.split('.')[0]
+        ClassLabels = int(FileString.split('_')[0])
+        HandWritingLabels.append(ClassLabels)
+        TrainingDataSet[i,:] = Img2Vector(('digits/trainingDigits/%s'% FileNameString))
+    TestFileList = listdir('digits/testDigits')
+    ErrorCout = 0.0
+    NumberTestSet = len(TestFileList)
+    for i in range(NumberTestSet):
+        FileNameString = TestFileList[i]
+        FileString = FileNameString.split('.')[0]
+        ClassLabels = int(FileString.split('_')[0])
+        TestDataSet = Img2Vector('digits/testDigits/%s' % FileNameString)
+        ClassfierResult = Classfy0(TestDataSet,TrainingDataSet,HandWritingLabels,3)
+        print ("the classifier came back with: %d , the real answer is: %d" %(ClassfierResult,ClassLabels))
+        if (ClassfierResult != ClassLabels): ErrorCout +=1.0
+    print("\nthe total number of error is: %d" % ErrorCout)
+    print("\nthe total error rate is: %f" % (ErrorCout/float(NumberTestSet)))
 
 
 
@@ -152,7 +168,13 @@ if __name__ == '__main__':
     #---------------------2.2.4
     # DatingClassTest()
     # ---------------------2.2.5
-    ClassifyPerson()
-
+    # ClassifyPerson()
+    # ---------------------2.3.2
+    # Img2Vector('digits/testDigits/0_13.txt')
+    #test=Img2Vector('digits/testDigits/0_13.txt')
+    #print(test[0,0:31])
+    # print(type(test))
+    # ---------------------2.3.2
+    HandWritingClassTest()
 
 
