@@ -17,18 +17,19 @@ def createDataSet():
     #change to discrete values
     return dataSet, labels
 
-def calcShannonEnt(dataSet):
-    numEntries = len(dataSet)
-    labelCounts = {}
-    for featVec in dataSet: #the the number of unique elements and their occurance
-        currentLabel = featVec[-1]
-        if currentLabel not in labelCounts.keys(): labelCounts[currentLabel] = 0
-        labelCounts[currentLabel] += 1
-    shannonEnt = 0.0
-    for key in labelCounts:
-        prob = float(labelCounts[key])/numEntries
-        shannonEnt -= prob * log(prob, 2) #log base 2
-    return shannonEnt
+def CalcShannonENT(DataSet):
+    NumberEntries = len(DataSet)
+    LabelCounts = {}
+    for FeatVec in DataSet:
+        CurrentLabels = FeatVec[-1]
+        if CurrentLabels not in LabelCounts.key[]
+            LabelCounts[CurrentLabels] = 0
+        LabelCounts[CurrentLabels] += 1
+    ShannonEnt = 0.0
+    for key in LabelCounts:
+        probability = float(LabelCounts[key])/NumberEntries
+        ShannonEnt -= prob * log(prob,2)
+    return ShannonEnt
 
 def SplitDataSet(DataSet, Axis, Value):
     ResetDataSet = []
@@ -57,6 +58,25 @@ def chooseBestFeatureToSplit(dataSet):
             bestInfoGain = infoGain         #if better than current best, set to best
             bestFeature = i
     return bestFeature                      #returns an integer
+
+def ChooseBestFeatureToSplit(DataSet):
+    NumberFeatures = len(DataSet[0]) - 1
+    BaseEntropy = CalcShannonENT(DataSet)
+    BestInformationGain = 0.0, BestFeature = -1
+    for i in range(NumberFeatures):
+        FeatureList = [example[i] for example in DataSet]
+        UniqueValuse = set(FeatureList)
+        NewEntropy = 0.0
+        for Value in UniqueValuse:
+            SubDataSet = SplitDataSet(DataSet,i,Value)
+            Probility = len(SubDataSet)/float(len(DataSet))
+            NewEntropy += Probility * CalcShannonENT(SubDataSet)
+        InformationGain = BaseEntropy - NewEntropy
+        if (InformationGai:n > BestInformationGain):
+            BestInformationGain = InformationGain
+            BestFeature = i
+    return BestFeature
+
 
 def majorityCnt(classList):
     classCount={}
