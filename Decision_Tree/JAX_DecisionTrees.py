@@ -22,13 +22,13 @@ def CalcShannonENT(DataSet):
     LabelCounts = {}
     for FeatVec in DataSet:
         CurrentLabels = FeatVec[-1]
-        if CurrentLabels not in LabelCounts.key[]
+        if CurrentLabels not in LabelCounts.keys():
             LabelCounts[CurrentLabels] = 0
         LabelCounts[CurrentLabels] += 1
     ShannonEnt = 0.0
     for key in LabelCounts:
         probability = float(LabelCounts[key])/NumberEntries
-        ShannonEnt -= prob * log(prob,2)
+        ShannonEnt -= probability * log(probability,2)
     return ShannonEnt
 
 def SplitDataSet(DataSet, Axis, Value):
@@ -41,78 +41,65 @@ def SplitDataSet(DataSet, Axis, Value):
             ResetDataSet.append(ReduceFeatVec)
     return ResetDataSet
 
-def chooseBestFeatureToSplit(dataSet):
-    numFeatures = len(dataSet[0]) - 1      #the last column is used for the labels
-    baseEntropy = calcShannonEnt(dataSet)
-    bestInfoGain = 0.0; bestFeature = -1
-    for i in range(numFeatures):        #iterate over all the features
-        featList = [example[i] for example in dataSet]#create a list of all the examples of this feature
-        uniqueVals = set(featList)       #get a set of unique values
-        newEntropy = 0.0
-        for value in uniqueVals:
-            subDataSet = splitDataSet(dataSet, i, value)
-            prob = len(subDataSet)/float(len(dataSet))
-            newEntropy += prob * calcShannonEnt(subDataSet)
-        infoGain = baseEntropy - newEntropy     #calculate the info gain; ie reduction in entropy
-        if (infoGain > bestInfoGain):       #compare this to the best gain so far
-            bestInfoGain = infoGain         #if better than current best, set to best
-            bestFeature = i
-    return bestFeature                      #returns an integer
 
 def ChooseBestFeatureToSplit(DataSet):
     NumberFeatures = len(DataSet[0]) - 1
     BaseEntropy = CalcShannonENT(DataSet)
-    BestInformationGain = 0.0, BestFeature = -1
+    BestInformationGain = 0.0
+    BestFeature = -1
     for i in range(NumberFeatures):
         FeatureList = [example[i] for example in DataSet]
         UniqueValuse = set(FeatureList)
+        # print(UniqueValuse)
         NewEntropy = 0.0
         for Value in UniqueValuse:
             SubDataSet = SplitDataSet(DataSet,i,Value)
             Probility = len(SubDataSet)/float(len(DataSet))
             NewEntropy += Probility * CalcShannonENT(SubDataSet)
         InformationGain = BaseEntropy - NewEntropy
-        if (InformationGai:n > BestInformationGain):
+        if (InformationGain > BestInformationGain):
             BestInformationGain = InformationGain
             BestFeature = i
     return BestFeature
 
+def MajorityCnt(ClassList):
+    ClassCount = {}
+    for Vote in ClassCount:
+        if Vote not in ClassList.keys():
+            ClassCount[Vote] = 0
+        ClassCount[Vote] += 1
+    SotedClassCount = sorted(ClassCount.items(), key=operator.itemgetter(1), reverse=True)
+    return SotedClassCount
+def CreatTree(DataSet, Labels):
+    #将dataSet中的数据先按行依次放入example中，然后取得example中的example[-1]元素，放入列表classList中
+    #按行遍历，按列取数据的方法
+    ClassList = [example[-1] for example in DataSet]
+    if ClassList.count(ClassList[0]) == len(ClassList):
+        return ClassList[0]
+    if len(DataSet[0]) == 1:
+        return MajorityCnt(ClassList)
+    BestFeature = ChooseBestFeatureToSplit(DataSet)
+    BestFeatureLabels = Labels[BestFeature]
+    MyTree = {BestFeatureLabels:{}}
+    del(Labels[BestFeature])
+    FeatureValues = [example[BestFeature] for example in DataSet]
+    UniqueValues = set(FeatureValues)
+    for Value in UniqueValues:
+        SubLabels = Labels[:]
+        MyTree[BestFeature][Value] = ChooseBestFeatureToSplit(SplitDataSet(DataSet, BestFeature, Value), SubLabels)
+    return MyTree
 
-def majorityCnt(classList):
-    classCount={}
-    for vote in classList:
-        if vote not in classCount.keys(): classCount[vote] = 0
-        classCount[vote] += 1
-    sortedClassCount = sorted(classCount.items(), key=operator.itemgetter(1), reverse=True)
-    return sortedClassCount[0][0]
-
-def createTree(dataSet, labels):
-    classList = [example[-1] for example in dataSet]
-    if classList.count(classList[0]) == len(classList):
-        return classList[0]#stop splitting when all of the classes are equal
-    if len(dataSet[0]) == 1: #stop splitting when there are no more features in dataSet
-        return majorityCnt(classList)
-    bestFeat = chooseBestFeatureToSplit(dataSet)
-    bestFeatLabel = labels[bestFeat]
-    myTree = {bestFeatLabel:{}}
-    del(labels[bestFeat])
-    featValues = [example[bestFeat] for example in dataSet]
-    uniqueVals = set(featValues)
-    for value in uniqueVals:
-        subLabels = labels[:]       #copy all of labels, so trees don't mess up existing labels
-        myTree[bestFeatLabel][value] = createTree(splitDataSet(dataSet, bestFeat, value), subLabels)
-    return myTree
-
-def classify(inputTree, featLabels, testVec):
-    firstStr = list(inputTree)[0]
-    secondDict = inputTree[firstStr]
-    featIndex = featLabels.index(firstStr)
-    key = testVec[featIndex]
-    valueOfFeat = secondDict[key]
-    if isinstance(valueOfFeat, dict):
-        classLabel = classify(valueOfFeat, featLabels, testVec)
-    else: classLabel = valueOfFeat
-    return classLabel
+def classify(InputTree, FeatLabels, TestVec):
+    FistStr = list(InputTree)[0]
+    SecondDict = InputTree[FistStr]
+    FeatIndex = FeatLabels.index(FistStr)
+    key = TestVec[FeatIndex]
+    ValueOfFeat = SecondDict[key]
+    if isinstance(ValueOfFeat,dict):
+        ClassLabel = Classify(ValueOfFeat,FeatLabels, TestVec)
+    else:
+        ClassLabel = ValueOfFeat
+    return ClassLabel
 
 def storeTree(inputTree, filename):
     import pickle
@@ -126,5 +113,11 @@ def grabTree(filename):
     return pickle.load(fr)
 
 if __name__ == '__main__':
+    #--------
     DataSet, Labels = createDataSet()
-    SplitDataSet(DataSet,0,1)
+    print(len(DataSet[0]))
+    # SplitDataSet(DataSet,0,1)
+    # print(len(DataSet))
+    # print(CalcShannonENT(DataSet))
+    # print(ChooseBestFeatureToSplit(DataSet))
+
