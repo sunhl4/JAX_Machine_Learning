@@ -101,6 +101,8 @@ def classify(InputTree, FeatLabels, TestVec):
         ClassLabel = ValueOfFeat
     return ClassLabel
 
+
+
 def storeTree(inputTree, filename):
     import pickle
     fw = open(filename, 'wb')
