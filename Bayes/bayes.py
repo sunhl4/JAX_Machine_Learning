@@ -16,6 +16,8 @@ def loadDataSet():
     return postingList, classVec
 
 
+
+
 def createVocabList(dataSet):
     vocabSet = set([])  #create empty set
     for document in dataSet:
