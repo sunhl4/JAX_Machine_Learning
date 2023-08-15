@@ -15,6 +15,7 @@ def loadDataSet():
     classVec = [0, 1, 0, 1, 0, 1]    #1 is abusive, 0 not
     return postingList, classVec
 
+
 def createVocabList(dataSet):
     vocabSet = set([])  #create empty set
     for document in dataSet:
